@@ -64,7 +64,7 @@ function CheckDiamond(cube){
         if((Crown[0].position.x - point.x < 1) && (Crown[0].position.z - point.z < 1)){
             scene.remove(Crown[0]);
             move_dir = 4;
-            alert("done");
+            alert("Congratulations!");
         }
 }
 

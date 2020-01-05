@@ -232,6 +232,7 @@ function initPlane() {
 }
 
 function animate() {
+    console.log(move_dir);
     if (move_dir == 0) {
 
         cube_z += 0.4;
@@ -257,6 +258,17 @@ function animate() {
     else {
         camera.position.set(posX_cam, camera_height, posZ_cam);
         camera.lookAt(new THREE.Vector3(posX_cam - camera_disX, 0, posZ_cam + camera_disZ));
+
+        // 在此判断move_dir的状态是 3 失败 还是 4 结束游戏
+        if (move_dir == 3) {
+            // var dialog = document.creat eElement('div1');
+            // dialog.style.cssText = "width:200px;height:200px;background:#636363;text - align: center; line - height: 220px";
+            
+            $(document).ready(function () {
+                $("div1").fadeIn();
+                $("div2").fadeIn();
+            });
+        }
     }
     //更新控制器
     renderer.clear();
