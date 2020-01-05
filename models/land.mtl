@@ -1,0 +1,28 @@
+newmtl Shell_004Mat
+Kd 0.8 0.8 0.8
+illum 2
+
+newmtl Shell_003Mat
+Kd 0.8 0.8 0.8
+illum 2
+
+newmtl Shell_002Mat
+Kd 0.8 0.8 0.8
+illum 2
+
+newmtl Shell_001Mat
+Kd 0.8 0.8 0.8
+illum 2
+
+newmtl Shell_000Mat
+Kd 0.8 0.8 0.8
+illum 2
+
+newmtl road
+Kd 0.1985294 0.237221 1
+illum 2
+
+newmtl line
+Kd 0.3161765 0.7453344 1
+illum 2
+
