@@ -47,6 +47,7 @@ function initLight() {
     light.shadow.mapSize.height = 1024;
     scene.add(light);
 }
+var Crown = new Array();
 
 function initModel() {
 
@@ -93,7 +94,7 @@ function initModel() {
         author_objloader.load('models/author.obj', function (au) {
             au.scale.set(1, 1, 1);
             au.rotateY(-Math.PI / 2);
-            au.position.set(0.0, 0.0, -12);
+            au.position.set(0.0, 0.0, -12.0);
             for (k in au.children) {
                 au.children[k].castShadow = false;
             }
@@ -101,7 +102,27 @@ function initModel() {
         })
     })
 
+    var crown;
+    var crown_objLoader = new THREE.OBJLoader();
+    var crown_material = new THREE.MeshLambertMaterial({color: 0xffff00});
+    crown_objLoader.load("models/crown.obj",function (crown) {
+            crown.children.forEach(function (child) {
+                child.material = crown_material;
+                child.geometry.computeFaceNormals();
+                child.geometry.computeVertexNormals();
+            });
 
+            crown.scale.set(0.01, 0.01, 0.01);
+             
+            for(k in crown.children){
+                crown.children[k].castShadow = true;
+            }
+
+            crown.position.set(152,0,175);
+            scene.add(crown);
+            Crown[0] = crown;
+  
+    });
  }
 
 //初始化性能插件
@@ -170,7 +191,7 @@ function capture() {
 
     let imgData = renderer.domElement.toDataURL("image/jpeg");//这里可以选择png格式jpeg格式
     image.src = imgData;
-    //document.body.appendChild(image);//这样就可以查看截出来的图片了
+    document.body.appendChild(image);//这样就可以查看截出来的图片了
 }
 
 var move_dir = 2;
@@ -190,7 +211,7 @@ function setKeyEvents() {
         }
         if (event.keyCode == 80) {
             capture();
-            alert("p");
+            alert("Mouse Down and you'll see the Pic you've just captured!");
         }
     });
 }
@@ -249,8 +270,8 @@ function animate() {
 }
 
 var Diamond = new Array();
-var DiamondCount = 3;
-var Pos_diamond = [[0, 5], [19, 26], [48, 61]];
+var DiamondCount = 5;
+var Pos_diamond = [[0,5],[19,26],[48,61],[71,86],[91,113]];
 function createDiamond(x, z, i) {
     var diamond;
     var Diamond_objLoader = new THREE.OBJLoader();
@@ -270,6 +291,43 @@ function createDiamond(x, z, i) {
         Diamond[i] = diamond;
     });
 }
+// 更新div的位置
+function addDiv(divid,htmlstr,position) {
+    var addDivDom = document.createElement('div');
+    div1 = addDivDom;
+    var bodyDom = document.body;
+    bodyDom.insertBefore(addDivDom, bodyDom.lastChild);
+    addDivDom.classList = 'tap';
+    addDivDom.innerHTML = htmlstr;
+    addDivDom.id = divid;
+    var screenPosition;
+    screenPosition=docCoord2Screen(position.x,position.y,0);
+    var worldPosition=screenCoord2World(screenPosition.x,screenPosition.y);//屏幕坐标转为世界坐标
+    addDivDom.style.top = screenPosition.y + 'px';//y
+    addDivDom.style.left = screenPosition.x + 'px';//x
+    var divStr={"id":divid,"position":worldPosition}//存入divid与div的世界坐标
+    divList.push(divStr);
+}
+//世界坐标转屏幕坐标
+function worldToScreenPosition (divWorldPosition) {//divWorldPosition
+    if(divWorldPosition==null||divWorldPosition==undefined||divWorldPosition==''){
+      divWorldPosition={x:0, y: 0, z:0};
+    };
+      var camera=getCamera();
+      var world_vector = new THREE.Vector3(divWorldPosition.x, divWorldPosition.y, divWorldPosition.z);//世界坐标系 必须根据世界坐标系计算
+      let vector = world_vector.project(camera);
+      // console.log("vector",vector)
+      var halfWidth = window.innerWidth / 2;
+      var  halfHeight = window.innerHeight / 2;
+      return {
+          x: Math.round(vector.x * halfWidth + halfWidth),
+          y: Math.round(-vector.y * halfHeight + halfHeight)
+      };
+}
+
+function initdiv(){
+    
+}
 
 function draw() {
     initGui();
@@ -279,6 +337,7 @@ function draw() {
     initLight();
     initPlane();
     initModel();
+
     //initDiamond();
     var diamond_count = 0;
     for (; diamond_count < DiamondCount; diamond_count++) {

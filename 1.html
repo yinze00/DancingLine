@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>恒定速度</title>
+    <style>
+        .box {
+            position: absolute;
+            left: 0;
+            top: 30px;
+            width: 50px;
+            height: 50px;
+            border: solid black 1px;
+            background-color: #aaa;
+        }
+
+        .container {
+            position: relative;
+            margin-top: 20px;
+            margin-bottom: 100px;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div>
+        <span>想要速度</span><input type="text" value="1" id="wantsudu">
+        <div id="cv-box" class="box"></div>
+        <input id="cv-button" value="Fade out" onclick="startConstantVelocityAnimation()" type="button" />
+    </div>
+    <script>
+        var setupButton = function (button, label, onclickHandler) {
+            button.value = label;
+            button.onclick = onclickHandler;
+            button.disabled = false;
+        };
+        var startConstantVelocityAnimation = function () {
+
+            //想取想要的速度
+            var velocity = parseFloat(document.getElementById("wantsudu").value);
+            console.log(velocity);
+            //获取要实现动画的对象必要时进行初始化
+            var box = document.getElementById("cv-box");
+            box.style.opacity = box.style.opacity || "1";
+            var fadeRate = 500 / (velocity * 1000);
+            //    alert(box.style.left);
+            //开始动画  setInterval() 方法可按照指定的周期（以毫秒计）来调用函数或计算表达式
+            var intervalID = setInterval(function () {
+                var newOpacity = parseFloat(box.style.opacity) - fadeRate;
+                if (newOpacity <= 0) {
+                    newOpacity = 0;
+                    clearInterval(intervalID);
+                    setupButton(document.getElementById("cv-button"), "Fade In", startFadeInAnimation);
+                }
+                box.style.opacity = newOpacity;
+            }, 500);
+            //切换启动按钮停止动画
+            setupButton(document.getElementById("cv-button"), "Fade In",
+                function () {
+                    clearInterval(intervalID);
+                    //切换启动按钮以停止动画
+                    setupButton(document.getElementById("cv-button"),
+                        "Fade out", startConstantVelocityAnimation
+                    );
+                }
+            )
+        };
+        var startFadeInAnimation = function () {
+            // Grab the desired time to fade.
+            var fadeTime = parseFloat(document.getElementById("wantsudu").value);
+
+            // Grab the object to animate, and initialize if necessary.
+            var box = document.getElementById("cv-box");
+            box.style.opacity = box.style.opacity || "0";
+
+            // Start animating.
+            var fadeRate = 500 / (fadeTime * 1000);
+            document.getElementById("cv-button").disabled = true;
+            var intervalID = setInterval(function () {
+                // Calculate the new values.
+                var newOpacity = parseFloat(box.style.opacity) + fadeRate;
+                if (newOpacity > 1) {
+                    // Upon reaching maximum opacity, stop the animation and toggle
+                    // the function of the fade button.
+                    newOpacity = 1;
+                    clearInterval(intervalID);
+                    setupButton(document.getElementById("cv-button"),
+                        "Fade Out", startConstantVelocityAnimation);
+                }
+
+                box.style.opacity = newOpacity;
+            }, 500);
+        };
+
+
+
+
+    </script>
+
+</body>
+
+</html>

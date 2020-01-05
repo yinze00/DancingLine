@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+    <script src="lib/jquery-1.11.1.min.js"></script>
     <meta charset="UTF-8">
-    <title>Title</title>
     <style type="text/css">
-        html, body {
+        html,
+        body {
             margin: 0;
             height: 100%;
         }
@@ -13,10 +15,58 @@
             display: block;
         }
 
-    </style>
-</head>
-<body onload="draw();">
+        .mainddd {
+            text-align: center;
+            /*让div内部文字居中*/
+            background-color: #7f7f7f;
+            border-radius: 20px;
+            width: 600px;
+            height: 100px;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
 
+        }
+
+        .test {
+            text-align: center;
+            line-height: 100px;
+        }
+
+
+        tap {
+            position: absolute;
+            background-color: MidnightBlue;
+            background-color: rgba(0, 10, 40);
+            border-top-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            opacity: 0.5;
+            font-size: 4px;
+            color: aqua;
+            width: 36px;
+            height: 44px;
+            padding: 1px 1px 1px;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            $("div").click(function () {
+                $(this).hide();
+            });
+        });
+    </script>
+</head>
+
+<body onload="draw();">
+    <div class="mainddd">
+        <h1>Click the SPACE bar to Start the Game! Wish you Good Luck!</h1>
+        <!-- <div id="div2" style="width:80px;height:80px;background-color:green;">
+            Click the SPACE bar to Start the Game!  Wish you Good Luck!</div> -->
+
+    </div>
 </body>
 <script src="lib/three.js"></script>
 <script src="lib/js/loaders/OBJLoader.js"></script>
@@ -32,4 +82,5 @@
 <audio src="models/music.mp3" id="myaudio" controls="controls" loop="false" hidden="true">
 
 </audio>
+
 </html>
