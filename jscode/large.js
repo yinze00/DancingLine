@@ -94,9 +94,9 @@ function initModel() {
         author_objloader.load('models/author.obj', function (au) {
             au.scale.set(1, 1, 1);
             au.rotateY(-Math.PI / 2);
-            au.position.set(0.0, 0.0, -12.0);
+            au.position.set(0.0, -0.5, -12.0);
             for (k in au.children) {
-                au.children[k].castShadow = false;
+                au.children[k].castShadow = true;
             }
             scene.add(au)
         })
@@ -120,8 +120,7 @@ function initModel() {
 
             crown.position.set(152,0,175);
             scene.add(crown);
-            Crown[0] = crown;
-  
+            Crown[0] = crown;  
     });
  }
 
@@ -266,6 +265,21 @@ function animate() {
             
             $(document).ready(function () {
                 $("div1").fadeIn();
+            });
+            $(document).ready(function () {
+                $("h2").click(function () {
+                    $(this).hide();
+                    move_dir = 2;
+                    // 编写
+                    window.location.replace(window.location.href); 
+                });
+                $("h3").click(function () {
+                    $(this).hide();
+                    window.opener=null; var t=window.open('', '_self', ''); t.close()
+                })
+            });
+        } else if (move_dir == 4) {
+            $(document).ready(function () {
                 $("div2").fadeIn();
             });
         }
@@ -303,43 +317,7 @@ function createDiamond(x, z, i) {
         Diamond[i] = diamond;
     });
 }
-// 更新div的位置
-function addDiv(divid,htmlstr,position) {
-    var addDivDom = document.createElement('div');
-    div1 = addDivDom;
-    var bodyDom = document.body;
-    bodyDom.insertBefore(addDivDom, bodyDom.lastChild);
-    addDivDom.classList = 'tap';
-    addDivDom.innerHTML = htmlstr;
-    addDivDom.id = divid;
-    var screenPosition;
-    screenPosition=docCoord2Screen(position.x,position.y,0);
-    var worldPosition=screenCoord2World(screenPosition.x,screenPosition.y);//屏幕坐标转为世界坐标
-    addDivDom.style.top = screenPosition.y + 'px';//y
-    addDivDom.style.left = screenPosition.x + 'px';//x
-    var divStr={"id":divid,"position":worldPosition}//存入divid与div的世界坐标
-    divList.push(divStr);
-}
-//世界坐标转屏幕坐标
-function worldToScreenPosition (divWorldPosition) {//divWorldPosition
-    if(divWorldPosition==null||divWorldPosition==undefined||divWorldPosition==''){
-      divWorldPosition={x:0, y: 0, z:0};
-    };
-      var camera=getCamera();
-      var world_vector = new THREE.Vector3(divWorldPosition.x, divWorldPosition.y, divWorldPosition.z);//世界坐标系 必须根据世界坐标系计算
-      let vector = world_vector.project(camera);
-      // console.log("vector",vector)
-      var halfWidth = window.innerWidth / 2;
-      var  halfHeight = window.innerHeight / 2;
-      return {
-          x: Math.round(vector.x * halfWidth + halfWidth),
-          y: Math.round(-vector.y * halfHeight + halfHeight)
-      };
-}
 
-function initdiv(){
-    
-}
 
 function draw() {
     initGui();
