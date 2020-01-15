@@ -175,25 +175,18 @@ function onWindowResize() {
 
 }
 
-/**
- * 获取mimeType
- * @param  {String} type the old mime-type
- * @return the new mime-type
- */
-var _fixType = function(type) {
-    type = type.toLowerCase().replace(/jpg/i, 'jpeg');
-    var r = type.match(/png|jpeg|bmp|gif/)[0];
-    return 'image/' + r;
-}
 
-var saveFile = function (data, filename) {
-    var save_link = document.createElementNS('http://yinze.xyz', 'a');
-    save_link.href = data;
-    save_link.download = filename;
-
-    var event = document.createEvent('MouseEvents');
-    event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-    save_link.dispatchEvent(event);
+const downloadFile = (url, fileName = '') => {
+    let eleLink = document.createElement('a');
+    eleLink.download = fileName;
+    eleLink.style.display = 'none';
+    eleLink.href = url;
+    // 受浏览器安全策略的因素，动态创建的元素必须添加到浏览器后才能实施点击
+    document.body.appendChild(eleLink);
+    // 触发点击  
+    eleLink.click();
+    // 然后移除
+    document.body.removeChild(eleLink);
 };
 
 function capture() {
@@ -202,14 +195,12 @@ function capture() {
     renderer.render(scene, camera);//此处renderer为three.js里的渲染器，scene为场景 camera为相机
 
     let imgData = renderer.domElement.toDataURL(type);//这里可以选择png格式jpeg格式
-    imgData = imgData.replace(_fixType(type),'image/octet-stream');
+    // imgData = imgData.replace(_fixType(type),'image/octet-stream');
 
     image.src = imgData;
-    document.body.appendChild(image);//这样就可以查看截出来的图片了
-    var filename = 'Capture_' + (new Date()).getTime() + '.' + 'jpeg';
-    // saveFile(ImageData, filename);
-    // window.location.href = image.src;
-    var doc = new jsPDF('p', 'mm');
+
+    downloadFile(imgData, 'cap.png');
+
 }
 
 var move_dir = 2;
@@ -229,7 +220,7 @@ function setKeyEvents() {
         }
         if (event.keyCode == 80) {
             capture();
-            alert("Mouse Down and you'll see the Pic you've just captured!");
+            // alert("Mouse Down and you'll see the Pic you've just captured!");
         }
     });
 }
