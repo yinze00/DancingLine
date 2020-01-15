@@ -199,7 +199,7 @@ function capture() {
 
     image.src = imgData;
 
-    downloadFile(imgData, 'cap.png');
+    downloadFile(imgData, 'Capture_' + (new Date()).getTime() + '.' + 'png');
 
 }
 
