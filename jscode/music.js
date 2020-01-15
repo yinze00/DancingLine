@@ -10,4 +10,7 @@ function autoPlay() {
 function closePlay() {
         myAuto.pause();
         myAuto.load();
+}
+function pausePlay() {
+    myAuto.pause();
     }

@@ -1,5 +1,6 @@
 var renderer;
 var camera_height = 20;
+var pause_dir = 0;
 var camera_disZ = 10;
 var camera_disX = -20;
 function initRender() {
@@ -210,7 +211,7 @@ function setKeyEvents() {
     window.addEventListener('keydown', function (e) {
         if (event.keyCode == 32) {
             if (move_dir == 2) {
-                move_dir = 0;
+                move_dir = pause_dir;
                 autoPlay();
             }
             else if (move_dir == 0)
@@ -219,6 +220,9 @@ function setKeyEvents() {
                 move_dir = 0;
         }
         if (event.keyCode == 80) {
+            pause_dir = move_dir;
+            move_dir = 2;
+            pausePlay();
             capture();
             // alert("Mouse Down and you'll see the Pic you've just captured!");
         }
