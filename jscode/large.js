@@ -43,17 +43,13 @@ function initLight() {
 
     //告诉平行光需要开启阴影投射
     light.castShadow = true;
-    light.shadow.mapSize.width = 1024;
-    light.shadow.mapSize.height = 1024;
+    light.shadow.mapSize.width = 4096;
+    light.shadow.mapSize.height = 4096;
     scene.add(light);
 }
 var Crown = new Array();
 
 function initModel() {
-
-    //辅助工具
-    var helper = new THREE.AxesHelper(50);
-    scene.add(helper);
 
     var land_material = new THREE.MeshLambertMaterial({ color: 0x5C3A21 });
     var land_objLoader = new THREE.OBJLoader();
@@ -89,7 +85,7 @@ function initModel() {
 
     var author_mtlloader = new THREE.MTLLoader();
     author_mtlloader.load('models/author.mtl', function (author) {
-        var author_objloader = new THREE.OBJLoader();  
+        var author_objloader = new THREE.OBJLoader();
         author_objloader.setMaterials(author);
         author_objloader.load('models/author.obj', function (au) {
             au.scale.set(1, 1, 1);
@@ -104,25 +100,25 @@ function initModel() {
 
     var crown;
     var crown_objLoader = new THREE.OBJLoader();
-    var crown_material = new THREE.MeshLambertMaterial({color: 0xffff00});
-    crown_objLoader.load("models/crown.obj",function (crown) {
-            crown.children.forEach(function (child) {
-                child.material = crown_material;
-                child.geometry.computeFaceNormals();
-                child.geometry.computeVertexNormals();
-            });
+    var crown_material = new THREE.MeshLambertMaterial({ color: 0xffff00 });
+    crown_objLoader.load("models/crown.obj", function (crown) {
+        crown.children.forEach(function (child) {
+            child.material = crown_material;
+            child.geometry.computeFaceNormals();
+            child.geometry.computeVertexNormals();
+        });
 
-            crown.scale.set(0.01, 0.01, 0.01);
-             
-            for(k in crown.children){
-                crown.children[k].castShadow = true;
-            }
+        crown.scale.set(0.01, 0.01, 0.01);
 
-            crown.position.set(152,0,175);
-            scene.add(crown);
-            Crown[0] = crown;  
+        for (k in crown.children) {
+            crown.children[k].castShadow = true;
+        }
+
+        crown.position.set(152, 0, 175);
+        scene.add(crown);
+        Crown[0] = crown;
     });
- }
+}
 
 //初始化性能插件
 var stats;
@@ -147,10 +143,6 @@ function initControls() {
     controls.enableZoom = false;
     //是否自动旋转
     controls.autoRotate = false;
-    //设置相机距离原点的最远距离
-    //controls.minDistance  = 1;
-    //设置相机距离原点的最远距离
-    //controls.maxDistance  = 200;
     //是否开启右键拖拽
     controls.enablePan = true;
 }
@@ -183,14 +175,41 @@ function onWindowResize() {
 
 }
 
+/**
+ * 获取mimeType
+ * @param  {String} type the old mime-type
+ * @return the new mime-type
+ */
+var _fixType = function(type) {
+    type = type.toLowerCase().replace(/jpg/i, 'jpeg');
+    var r = type.match(/png|jpeg|bmp|gif/)[0];
+    return 'image/' + r;
+}
+
+var saveFile = function (data, filename) {
+    var save_link = document.createElementNS('http://yinze.xyz', 'a');
+    save_link.href = data;
+    save_link.download = filename;
+
+    var event = document.createEvent('MouseEvents');
+    event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+    save_link.dispatchEvent(event);
+};
 
 function capture() {
     var image = new Image();
+    var type = 'png'
     renderer.render(scene, camera);//此处renderer为three.js里的渲染器，scene为场景 camera为相机
 
-    let imgData = renderer.domElement.toDataURL("image/jpeg");//这里可以选择png格式jpeg格式
+    let imgData = renderer.domElement.toDataURL(type);//这里可以选择png格式jpeg格式
+    imgData = imgData.replace(_fixType(type),'image/octet-stream');
+
     image.src = imgData;
     document.body.appendChild(image);//这样就可以查看截出来的图片了
+    var filename = 'Capture_' + (new Date()).getTime() + '.' + 'jpeg';
+    // saveFile(ImageData, filename);
+    // window.location.href = image.src;
+    var doc = new jsPDF('p', 'mm');
 }
 
 var move_dir = 2;
@@ -230,26 +249,32 @@ function initPlane() {
 
 }
 
-function animate() {
-    console.log(move_dir);
-    if (move_dir == 0) {
 
-        cube_z += 0.4;
-        posZ_cam = camera.position.z + 0.4;
+var time_last;
+var time_now;
+var step = 15;
+var old_pos = 0;
+function animate() {
+    time_now = Date.now();
+    if (move_dir == 2) {
+        time_last = time_now;
+    }
+    else if (move_dir == 0) {
+        old_pos = cube_z;
+        cube_z += step * (time_now - time_last) / 1000;
+        posZ_cam = camera.position.z + step * (time_now - time_last) / 1000;
         draw_cube();
-        /*while(move_dir == 3)
-            ;*/
+        time_last = time_now;
         camera.position.set(posX_cam, camera_height, posZ_cam);
         camera.lookAt(new THREE.Vector3(posX_cam - camera_disX, 0, posZ_cam + camera_disZ));
         ChangeTree();
     }
     else if (move_dir == 1) {
-
-        cube_x += 0.4;
-        posX_cam = camera.position.x + 0.4;
+        old_pos = cube_x;
+        cube_x += step * (time_now - time_last) / 1000;
+        posX_cam = camera.position.x + step * (time_now - time_last) / 1000;
         draw_cube();
-        /*while(move_dir == 3)
-            ;*/
+        time_last = time_now;
         camera.position.set(posX_cam, camera_height, posZ_cam);
         camera.lookAt(new THREE.Vector3(posX_cam - camera_disX, 0, posZ_cam + camera_disZ));
         ChangeTree();
@@ -260,9 +285,6 @@ function animate() {
 
         // 在此判断move_dir的状态是 3 失败 还是 4 结束游戏
         if (move_dir == 3) {
-            // var dialog = document.creat eElement('div1');
-            // dialog.style.cssText = "width:200px;height:200px;background:#636363;text - align: center; line - height: 220px";
-            
             $(document).ready(function () {
                 $("div1").fadeIn();
             });
@@ -271,11 +293,11 @@ function animate() {
                     $(this).hide();
                     move_dir = 2;
                     // 编写
-                    window.location.replace(window.location.href); 
+                    window.location.replace(window.location.href);
                 });
                 $("h3").click(function () {
                     $(this).hide();
-                    window.opener=null; var t=window.open('', '_self', ''); t.close()
+                    window.opener = null; var t = window.open('', '_self', ''); t.close()
                 })
             });
         } else if (move_dir == 4) {
@@ -297,7 +319,7 @@ function animate() {
 
 var Diamond = new Array();
 var DiamondCount = 5;
-var Pos_diamond = [[0,5],[19,26],[48,61],[71,86],[91,113]];
+var Pos_diamond = [[0, 5], [19, 26], [48, 61], [71, 86], [91, 113]];
 function createDiamond(x, z, i) {
     var diamond;
     var Diamond_objLoader = new THREE.OBJLoader();
@@ -337,7 +359,7 @@ function draw() {
     createParticles(4, true, 0.6, true, false, 0xffffff);
     initControls();
     initStats();
-    setKeyEvents();//定义键盘按键事件 
+    setKeyEvents();//定义键盘按键事件
     animate();
     window.onresize = onWindowResize;
 }

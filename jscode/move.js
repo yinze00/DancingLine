@@ -41,7 +41,7 @@ function ChangeTree(){
 function CheckDiamond(cube){
     var point = cube.position.clone();
     for(var k = 0; k < DiamondCount; k++){
-        if((Diamond[k].position.x - point.x < 1) && (Diamond[k].position.z - point.z < 1)){
+        if(((Diamond[k].position.x - point.x) < 1) && ((Diamond[k].position.z - point.z) < 1) && ((Diamond[k].position.z - point.z) > -1) && ((Diamond[k].position.x - point.x) > -1)){
             scene.remove(Diamond[k]);
             for(var i = k; i < DiamondCount; i++){
                 Diamond[i] = Diamond[i+1];
@@ -69,53 +69,97 @@ function CheckDiamond(cube){
 }
 
 function draw_cube(){
+    var cube = new Array();
     var cubeGeometry = new THREE.BoxGeometry(1,1,1);
-
+    var count = 0;
     var cubeMaterial = new THREE.MeshLambertMaterial({color:0x5C3A21});
-    var cube = new THREE.Mesh(cubeGeometry,cubeMaterial);
-     
+    cube[count++] = new THREE.Mesh(cubeGeometry,cubeMaterial);
+    cube[0].position.x= cube_x;
+    cube[0].position.y = cube_y;
+    cube[0].position.z= cube_z; 
+    var first = false;//第一个方块碰撞是否检测
     //设置cube的位置 
-    cube.position.x= cube_x;
-    cube.position.y = cube_y;
-    cube.position.z= cube_z;
-    cube.castShadow = true;
-    //cube添加到场景中
-
-     scene.add(cube);
-    var originPoint1 = cube.position.clone();
-    var originPoint2 = cube.position.clone();
-    var directionVector = cube.position.clone();
-        if(move_dir == 0){
-            originPoint1.x = cube.position.x- 0.5;
-            originPoint2.x = cube.position.x + 0.5;
-            directionVector.x = 0;
-            directionVector.y = 0;
-            directionVector.z = 1;
+    if(move_dir == 0){
+        cube[0].position.z= old_pos;
+        while(cube[count - 1].position.z < cube_z){
+            cube[count] = new THREE.Mesh(cubeGeometry,cubeMaterial);
+            cube[count].position.x= cube_x;
+            cube[count].position.y = cube_y;
+            if(cube[count - 1].position.z + 1 <= cube_z){
+                cube[count].position.z = cube[count - 1].position.z + 1;
+            }
+            else{
+                cube[count].position.z = cube_z;
+            }
+            cube[count].castShadow = true;
+            scene.add(cube[count]);
+            var originPoint1 = cube[count].position.clone();
+            var originPoint2 = cube[count].position.clone();
+            var directionVector = cube[count].position.clone();
+                originPoint1.x = cube[count].position.x- 0.5;
+                originPoint2.x = cube[count].position.x + 0.5;
+                directionVector.x = 0;
+                directionVector.y = 0;
+                directionVector.z = 1;
+            var ray = new THREE.Raycaster(originPoint1,directionVector.clone().normalize() );
+            var collisionResults = ray.intersectObjects(collidableMeshList);
+            if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() + 0.05){
+                move_dir = 3;
+                closePlay();
+                return;
+            }
+            ray = new THREE.Raycaster(originPoint2,directionVector.clone().normalize() );
+            collisionResults = ray.intersectObjects(collidableMeshList);
+            if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() + 0.05){
+                move_dir = 3;
+                closePlay();
+                return;
+            }
+            CheckDiamond(cube[count]);
+            CheckCrown(cube[count]); 
+            count++;
         }
-        else if(move_dir == 1){
-            originPoint1.z = cube.position.z- 0.5;
-            originPoint2.z = cube.position.z + 0.5;
-            directionVector.x = 1;
-            directionVector.y = 0;
-            directionVector.z = 0;
+    }
+    else if(move_dir == 1){
+        cube[0].position.x= old_pos; 
+        while(cube[count - 1].position.x < cube_x){
+            cube[count] = new THREE.Mesh(cubeGeometry,cubeMaterial);
+            cube[count].position.z= cube_z;
+            cube[count].position.y = cube_y;
+            if(cube[count - 1].position.x + 1 <= cube_x){
+                cube[count].position.x = cube[count - 1].position.x + 1;
+            }
+            else{
+                cube[count].position.x = cube_x;
+            }
+            cube[count].castShadow = true;
+            scene.add(cube[count]);
+            var originPoint1 = cube[count].position.clone();
+            var originPoint2 = cube[count].position.clone();
+            var directionVector = cube[count].position.clone();
+                originPoint1.x = cube[count].position.x- 0.5;
+                originPoint2.x = cube[count].position.x + 0.5;
+                directionVector.x = 1;
+                directionVector.y = 0;
+                directionVector.z = 0;
+            var ray = new THREE.Raycaster(originPoint1,directionVector.clone().normalize() );
+            var collisionResults = ray.intersectObjects(collidableMeshList);
+            if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()/2 + 0.05){
+                move_dir = 3;
+                closePlay();
+                return;
+            }
+            ray = new THREE.Raycaster(originPoint2,directionVector.clone().normalize() );
+            collisionResults = ray.intersectObjects(collidableMeshList);
+            if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()/2 + 0.05){
+                move_dir = 3;
+                closePlay();
+                return;
+            }
+            CheckDiamond(cube[count]);
+            CheckCrown(cube[count]);  
+            count++;
         }
-        var ray = new THREE.Raycaster(originPoint1,directionVector.clone().normalize() );
-        var collisionResults = ray.intersectObjects(collidableMeshList);
-        if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()/2){
-            move_dir = 3;
-            closePlay();
-            return;
-            //break;
-        }
-        ray = new THREE.Raycaster(originPoint2,directionVector.clone().normalize() );
-        collisionResults = ray.intersectObjects(collidableMeshList);
-        if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()/2){
-            move_dir = 3;
-            closePlay();
-            return;
-            //break;
-        }
-    CheckDiamond(cube);
-    CheckCrown(cube);
-   
+    }
+        
 }
