@@ -2,7 +2,7 @@
 CG2019 course project @ZheJiang University
 
 ### Demo : http://yinze.xyz/DancingLine
-
+### Github repository：https://github.com/yinze00/dancingline
 ## Group members
 > 汪俊威、胡诗韵、李晨昊、杜政彤、田聪
 
