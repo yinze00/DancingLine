@@ -35,4 +35,4 @@ This project exists thanks to all the people who contribute.
 
 ## License
 
-[MIT](LICENSE) © Richard Littauer
+[MIT](LICENSE) © Yinze
